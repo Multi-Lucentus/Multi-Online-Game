@@ -16,6 +16,9 @@ import java.net.Socket;
  */
 public class ServerDriver implements Runnable
 {
+    // Constants
+    private static final String SERVER_INFO = "The Official Online Multi Game of 2020";
+
     // Properties
     private int portNum;
     private Thread thread;
@@ -70,6 +73,18 @@ public class ServerDriver implements Runnable
             // Get input and output streams
             in = new DataInputStream(server.getInputStream());
             out = new DataOutputStream(server.getOutputStream());
+
+            // Listen to client while it is in use
+            String outputString;
+
+            // TODO: Socket just closes when connected?
+            do
+            {
+                outputString = ListenToClient(in.readUTF());
+                out.writeUTF(outputString);
+            }
+            while(!outputString.equals("STOP"));
+
         }
         catch(IOException e)
         {
@@ -100,5 +115,57 @@ public class ServerDriver implements Runnable
         {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Much of client input will be in string format to make my life easier hopefully
+     * (Watch me come back in like 2 weeks hating myself for this)
+     * Input will be made up of a string with multiple words so we can split
+     *
+     * TODO: Could totally encrypt and decrypt data from client to server for fun
+     *
+     * @param clientInput is the string that is sent from the client
+     * @return A string is returned that answers the
+     */
+    private String ListenToClient(String clientInput)
+    {
+        // Split the entire string
+        String[] words = clientInput.split(" ");
+
+        switch(words[0])
+        {
+            case "CHECK":
+                return "";
+
+            case "GET":
+                // Retrieve data for the user
+                // Check for what the user wants
+                if(words[1].equalsIgnoreCase("ServerInfo"))
+                    return SERVER_INFO;
+
+            default:
+                return "ERROR: No matching command.";
+
+        }
+    }
+
+    /**
+     *
+     * @param input
+     * @return
+     */
+    private String decryptInput(String input)
+    {
+       return "";
+    }
+
+    /**
+     *
+     * @param output
+     * @return
+     */
+    private String encryptOutput(String output)
+    {
+        return "";
     }
 }
