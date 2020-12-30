@@ -1,9 +1,7 @@
 package com.multi.Server;
 
 // Imports
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -30,8 +28,12 @@ public class ServerDriver
     // Constructors
     /**
      * Default Constructor
+     * TODO: Determine a suitable port number
      */
-    public ServerDriver() { }
+    public ServerDriver() throws IOException
+    {
+
+    }
 
     /**
      * The constructor that
@@ -44,6 +46,18 @@ public class ServerDriver
 
         // Create the Server Socket
         serverSocket = new ServerSocket(portNum);
+
+        // Get input and output streams
+        Socket socket = serverSocket.accept();
+
+        InputStream inputStream = socket.getInputStream();
+        in = new DataInputStream(inputStream);
+
+        OutputStream outputStream = socket.getOutputStream();
+        out = new DataOutputStream(outputStream);
+
+        // Retrieve messages from the server
+        messageLoop();
     }
 
     // Methods
@@ -55,19 +69,69 @@ public class ServerDriver
      */
     public static void main(String[] args)
     {
-        // TODO: Check command-line arguments
+        // Check command-line arguments
+        if(args.length == 1)
+        {
+            // Port number is provided
+            // Get the port number from the args
+            int port_number = Integer.parseInt(args[0]);
 
-        // Get the port number from the args
-        int port_number = Integer.parseInt(args[0]);
+            // Create a new instance of the server
+            try
+            {
+                ServerDriver server = new ServerDriver(port_number);
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else if(args.length == 0)
+        {
+            // Port number is not provided
+            try
+            {
+                ServerDriver server = new ServerDriver();
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            // Too many arguments - throw error
+            System.err.println("Too many command-line arguments");
+        }
+    }
 
-        // Create a new instance of the server
+    /**
+     *
+     */
+    private void messageLoop()
+    {
+        // Variables
+        String clientString, outputString;
+
         try
         {
-            ServerDriver server = new ServerDriver(port_number);
+            do
+            {
+                clientString = decryptMessage(in.readUTF());
+
+                outputString = respondToClientInput(clientString);
+
+                out.writeUTF(encryptMessage(outputString));
+
+            } while(true);
         }
         catch(IOException e)
         {
+            // Issue either reading or writing a message from/to client
             e.printStackTrace();
+
+            // TODO: Test
+            messageLoop();
         }
     }
 
@@ -81,7 +145,7 @@ public class ServerDriver
      * @param clientInput is the string that is sent from the client
      * @return A string is returned that answers the
      */
-    private String ListenToClient(String clientInput)
+    private String respondToClientInput(String clientInput)
     {
         // Split the entire string
         String[] words = clientInput.split(" ");
@@ -89,6 +153,10 @@ public class ServerDriver
         switch(words[0])
         {
             case "CHECK":
+                // 2 other arguments:
+                // First is name of file to check
+                // Second is the title to be checked
+
                 return "";
 
             case "GET":
@@ -98,30 +166,29 @@ public class ServerDriver
                     return SERVER_INFO;
 
             default:
+                // TODO: Make ClientInputException
                 return "ERROR: No matching command.";
 
         }
     }
 
     /**
-     *
+     * TODO
      * @param input
      * @return
      */
     private String decryptMessage(String input)
     {
-       return "";
+       return input;
     }
 
     /**
-     *
+     * TODO
      * @param output
      * @return
      */
     private String encryptMessage(String output)
     {
-
-
-        return "";
+        return output;
     }
 }
