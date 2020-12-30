@@ -14,14 +14,13 @@ import java.net.Socket;
  * @author Lucentus
  * @version Nov 9th, 2020
  */
-public class ServerDriver implements Runnable
+public class ServerDriver
 {
     // Constants
     private static final String SERVER_INFO = "The Official Online Multi Game of 2020";
 
     // Properties
     private int portNum;
-    private Thread thread;
     private ServerSocket serverSocket;
 
     private DataInputStream in;
@@ -49,50 +48,6 @@ public class ServerDriver implements Runnable
 
     // Methods
     /**
-     *
-     */
-    public void start()
-    {
-        // Initialize the thread and start it
-        thread = new Thread(this);
-        thread.start();
-    }
-
-    /**
-     *
-     */
-    @Override
-    public void run()
-    {
-        // Create the socket and get the data streams
-        try
-        {
-            // Create the socket
-            Socket server = serverSocket.accept();
-
-            // Get input and output streams
-            in = new DataInputStream(server.getInputStream());
-            out = new DataOutputStream(server.getOutputStream());
-
-            // Listen to client while it is in use
-            String outputString;
-
-            // TODO: Socket just closes when connected?
-            do
-            {
-                outputString = ListenToClient(in.readUTF());
-                out.writeUTF(outputString);
-            }
-            while(!outputString.equals("STOP"));
-
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Main method of Server machine
      * Start of program logic
      *
@@ -109,7 +64,6 @@ public class ServerDriver implements Runnable
         try
         {
             ServerDriver server = new ServerDriver(port_number);
-            server.start();
         }
         catch(IOException e)
         {
@@ -154,7 +108,7 @@ public class ServerDriver implements Runnable
      * @param input
      * @return
      */
-    private String decryptInput(String input)
+    private String decryptMessage(String input)
     {
        return "";
     }
@@ -164,8 +118,10 @@ public class ServerDriver implements Runnable
      * @param output
      * @return
      */
-    private String encryptOutput(String output)
+    private String encryptMessage(String output)
     {
+
+
         return "";
     }
 }
